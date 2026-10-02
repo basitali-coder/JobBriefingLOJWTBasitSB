@@ -1,0 +1,286 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External site</title>
+    <script src="https://masternaut--basit.sandbox.my.salesforce.com/lightning/lightning.out.latest/index.iife.prod.js"></script>
+    <style>
+        c-lightning-out-job-briefing-wrapper.loaded{
+                background-color:#ffffff;
+                height: 70vh !important;
+ 
+        }
+    </style>
+</head>
+<body>
+    <h1>External site element 1</h1>    
+    <button id="loginButton">
+        Login with Salesforce
+    </button>
+    
+    <lightning-out-application
+        id="loApp"
+        app-id="1Usbh00000000o1CAA"
+        components="c-lightning-out-job-briefing-wrapper">
+    </lightning-out-application>
+    
+    <c-lightning-out-job-briefing-wrapper> </c-lightning-out-job-briefing-wrapper>    
+    <h3>External site element 2</h3>
+    
+    
+    <script>
+    //Main script
+    // Salesforce configuration
+    
+    const SF_DOMAIN =
+        "https://masternaut--basit.sandbox.my.salesforce.com";
+    
+    const CLIENT_ID =
+        "3MVG97IVyarqycDnBbiu2NuL9tEGfJiQELfkJwnWmdPANPE.l6hNR9Zv68XNJl0qj1vbavS8p7oS99cCYyIZx";
+        
+    //For serverside call to avoid CORS limitations of salesforce
+    const WORKER_URL =
+        "https://small-cloud-d8ef.basit-ali.workers.dev/";
+    
+    const REDIRECT_URI =
+        window.location.origin + window.location.pathname;
+    // To expand height on load
+    function expandLightningComponent(){
+
+        const component = document.querySelector( "c-lightning-out-job-briefing-wrapper" );       
+        if(component){    
+            component.classList.add("loaded");    
+            console.log("Lightning component expanded");    
+        }
+    }    
+    
+    // Create a random PKCE code verifier
+    
+    function generateVerifier() {
+    
+        const chars =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    
+        let result = "";
+    
+        const random =
+            crypto.getRandomValues( new Uint8Array(64) );
+    
+        random.forEach(x => { result += chars[x % chars.length]; });
+    
+        return result;
+    }
+    
+    // Create the SHA-256 PKCE code challenge
+    
+    async function generateChallenge(verifier) {
+    
+        const data =
+            new TextEncoder().encode(verifier);
+    
+        const hash =
+            await crypto.subtle.digest(  "SHA-256", data);
+    
+        return btoa( String.fromCharCode( ...new Uint8Array(hash) ) ).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+        }
+    
+    // Redirect the user to Salesforce for login
+    
+    document
+    .getElementById("loginButton")
+    .onclick = async function () {
+        const verifier = generateVerifier();
+        sessionStorage.setItem("pkce_verifier", verifier);
+        const challenge =  await generateChallenge(verifier);
+        const loginUrl = SF_DOMAIN + "/services/oauth2/authorize?" +
+            new URLSearchParams({
+                response_type: "code",
+                client_id: CLIENT_ID,
+                redirect_uri: REDIRECT_URI,
+                code_challenge: challenge,
+                code_challenge_method: "S256"
+            });
+        window.location.href = loginUrl;
+    };
+    
+// Handle the OAuth callback from Salesforce
+(async function () {
+
+    // Read the authorization code from the URL
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const code =
+        params.get("code");
+
+    if (!code) {
+        return;
+    }
+
+
+    // Retrieve the PKCE verifier used during login
+    const verifier =
+        sessionStorage.getItem(
+            "pkce_verifier"
+        );
+
+
+    if (!verifier) {
+
+        alert(
+            "PKCE verifier not found in sessionStorage."
+        );
+
+        return;
+    }
+
+
+    /*
+     * Exchange authorization code for access token
+     *
+     * IMPORTANT:
+     * This now goes to Cloudflare Worker rather than
+     * Salesforce directly.
+     */
+
+    const tokenResponse =
+        await fetch(
+            WORKER_URL + "/token",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body:
+                    JSON.stringify({
+
+                        code:
+                            code,
+
+                        code_verifier:
+                            verifier,
+
+                        redirect_uri:
+                            REDIRECT_URI
+
+                    })
+            }
+        );
+
+
+    const token =
+        await tokenResponse.json();
+
+
+    console.log(
+        "Token response",
+        token
+    );
+
+
+    if (!tokenResponse.ok ||
+        !token.access_token) {
+
+        alert(
+            JSON.stringify(token)
+        );
+
+        return;
+    }
+
+
+    /*
+     * Remove the OAuth code from the
+     * browser address bar.
+     */
+
+    window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+    );
+
+
+    /*
+     * Get a Lightning Out frontdoor URL
+     * from the Cloudflare Worker.
+     */
+
+    const fdResponse =
+        await fetch(
+            WORKER_URL + "/frontdoor",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body:
+                    JSON.stringify({
+
+                        access_token:
+                            token.access_token
+
+                    })
+            }
+        );
+
+
+    const frontdoor =
+        await fdResponse.json();
+
+
+    console.log(
+        "Frontdoor response",
+        frontdoor
+    );
+
+
+    if (frontdoor.frontdoor_uri) {
+
+            const loApp = document.getElementById("loApp");
+
+loApp.setAttribute(
+    "frontdoor-url",
+    frontdoor.frontdoor_uri
+);
+
+console.log(
+    "ATTRIBUTE:",
+    loApp.getAttribute("frontdoor-url")
+);
+
+console.log(
+    "PROPERTY:",
+    loApp.frontdoorUrl
+);
+            // Expand component height after Salesforce session is ready
+            expandLightningComponent();
+
+
+    }
+    else {
+
+        alert(
+            JSON.stringify(frontdoor)
+        );
+
+    }
+
+})();
+
+
+
+</script>
+
+</body>
+</html>
