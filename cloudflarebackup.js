@@ -1,286 +1,238 @@
+//Verion 2.0
+//Change to MMO envirment principles
+//env is being passed in from cloud flare with attributes from settings such as privateKeyPem
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>External site</title>
-    <script src="https://masternaut--basit.sandbox.my.salesforce.com/lightning/lightning.out.latest/index.iife.prod.js"></script>
-    <style>
-        c-lightning-out-job-briefing-wrapper.loaded{
-                background-color:#ffffff;
-                height: 70vh !important;
- 
-        }
-    </style>
-</head>
-<body>
-    <h1>External site element 1</h1>    
-    <button id="loginButton">
-        Login with Salesforce
-    </button>
-    
-    <lightning-out-application
-        id="loApp"
-        app-id="1Usbh00000000o1CAA"
-        components="c-lightning-out-job-briefing-wrapper">
-    </lightning-out-application>
-    
-    <c-lightning-out-job-briefing-wrapper> </c-lightning-out-job-briefing-wrapper>    
-    <h3>External site element 2</h3>
-    
-    
-    <script>
-    //Main script
-    // Salesforce configuration
-    
-    const SF_DOMAIN =
-        "https://masternaut--basit.sandbox.my.salesforce.com";
-    
-    const CLIENT_ID =
-        "3MVG97IVyarqycDnBbiu2NuL9tEGfJiQELfkJwnWmdPANPE.l6hNR9Zv68XNJl0qj1vbavS8p7oS99cCYyIZx";
-        
-    //For serverside call to avoid CORS limitations of salesforce
-    const WORKER_URL =
-        "https://small-cloud-d8ef.basit-ali.workers.dev/";
-    
-    const REDIRECT_URI =
-        window.location.origin + window.location.pathname;
-    // To expand height on load
-    function expandLightningComponent(){
+//////////////Please review the below when changing any environment////////////
+///Start//
 
-        const component = document.querySelector( "c-lightning-out-job-briefing-wrapper" );       
-        if(component){    
-            component.classList.add("loaded");    
-            console.log("Lightning component expanded");    
-        }
-    }    
-    
-    // Create a random PKCE code verifier
-    
-    function generateVerifier() {
-    
-        const chars =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    
-        let result = "";
-    
-        const random =
-            crypto.getRandomValues( new Uint8Array(64) );
-    
-        random.forEach(x => { result += chars[x % chars.length]; });
-    
-        return result;
-    }
-    
-    // Create the SHA-256 PKCE code challenge
-    
-    async function generateChallenge(verifier) {
-    
-        const data =
-            new TextEncoder().encode(verifier);
-    
-        const hash =
-            await crypto.subtle.digest(  "SHA-256", data);
-    
-        return btoa( String.fromCharCode( ...new Uint8Array(hash) ) ).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
-        }
-    
-    // Redirect the user to Salesforce for login
-    
-    document
-    .getElementById("loginButton")
-    .onclick = async function () {
-        const verifier = generateVerifier();
-        sessionStorage.setItem("pkce_verifier", verifier);
-        const challenge =  await generateChallenge(verifier);
-        const loginUrl = SF_DOMAIN + "/services/oauth2/authorize?" +
-            new URLSearchParams({
-                response_type: "code",
-                client_id: CLIENT_ID,
-                redirect_uri: REDIRECT_URI,
-                code_challenge: challenge,
-                code_challenge_method: "S256"
-            });
-        window.location.href = loginUrl;
-    };
-    
-// Handle the OAuth callback from Salesforce
-(async function () {
+/*
+Salesforce org related vars
+*/
+const SF_DOMAIN = "https://masternaut--basit.sandbox.my.salesforce.com";
+const CLIENT_ID ="3MVG97IVyarqycDnBbiu2NuL9tISYp12KdkLGfm_qFZ6A9sAfokVo9BknrcvsKpxqJwsooCiwLObf0XIuJmHh"; //External App
+const LIGHTNING_OUT_APP_ID = "1Usbh00000000o1CAA";
 
-    // Read the authorization code from the URL
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
+//Would be repalced by MMO domain
+//This should be also added as CORS and trusted URL in salesforce org
+//Same should be set in salesforce external app redirect/callback
+//This domain URL must be in trusted URL and CORS in salesforce org
+const ALLOWED_ORIGIN = "https://basitali-coder.github.io"; 
 
-    const code =
-        params.get("code");
 
-    if (!code) {
-        return;
+//Key related vars
+//Might change or not used for actual MMO key
+const KEY_START_HEADER = "-----BEGIN RSA PRIVATE KEY-----";
+const KEY_END_HEADER = "-----END RSA PRIVATE KEY-----";
+
+///End//
+////////////////////////////////////////////////////////////
+
+function corsHeaders() {
+    return {"Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Vary": "Origin"};
+}
+
+
+function jsonResponse(data, status = 200) {
+    return new Response(JSON.stringify(data),{status,headers: {"Content-Type": "application/json",...corsHeaders()}});
+}
+
+
+/*
+ * Base64URL encoding
+ */
+function base64UrlEncode(data) {
+    let bytes;
+    if (typeof data === "string") {
+        bytes = new TextEncoder().encode(data);
+    } else {
+        bytes = new Uint8Array(data);
     }
 
+    let binary = "";
+    bytes.forEach(byte => binary += String.fromCharCode(byte));
 
-    // Retrieve the PKCE verifier used during login
-    const verifier =
-        sessionStorage.getItem(
-            "pkce_verifier"
-        );
+    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
 
 
-    if (!verifier) {
+//For cloud flare  RSA private key has been set to JWT_PRIVATE_KEY environment variable which is set implicitly by cloud flare
+//  i.e
+//        const privateKeyPem =  env.JWT_PRIVATE_KEY;
+//So no assignment is required for privateKeyPem 
+// For different backend use its approach
+// perhaps encription is required as below
 
-        alert(
-            "PKCE verifier not found in sessionStorage."
-        );
 
-        return;
+async function importPrivateKey(privateKeyPem) {
+    const pemContents = privateKeyPem.replace(KEY_START_HEADER, "").replace(KEY_END_HEADER, "").replace(/\s/g, "");
+    const binary = Uint8Array.from( atob(pemContents), c => c.charCodeAt(0));
+    return crypto.subtle.importKey("pkcs8", binary.buffer,{ name: "RSASSA-PKCS1-v1_5",
+                                                            hash: "SHA-256"}, 
+                                                          false, ["sign"]);
+}
+
+/*
+ *  Create Salesforce JWT
+    Doc: https://help.salesforce.com/s/articleView?id=mktg.dato_getstarted_token_api_jwt.htm&type=5
+ */
+async function createJWT(username, privateKeyPem) {
+    const now = Math.floor(Date.now()/1000);
+    const header = {alg: "RS256",typ: "JWT"};
+    const payload = {   iss: CLIENT_ID,
+                        sub: username,
+                        aud: SF_DOMAIN,
+                        exp: now + 180
+                    };
+
+    const encodedHeader = base64UrlEncode( JSON.stringify(header));
+    const encodedPayload = base64UrlEncode(JSON.stringify(payload));
+    const unsignedToken = encodedHeader +"." + encodedPayload;
+
+    const privateKey = await importPrivateKey(privateKeyPem);
+    const signature = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", privateKey, new TextEncoder().encode(unsignedToken));
+
+    return (unsignedToken +"." +base64UrlEncode(signature));
+}
+
+
+/*
+ * Salesforce JWT login
+ */
+async function getSalesforceToken(username, privateKeyPem) {
+
+    const assertion = await createJWT( username, privateKeyPem);
+
+    const response =await fetch(SF_DOMAIN +"/services/oauth2/token",
+                                { method: "POST",
+                                headers: {"Content-Type":"application/x-www-form-urlencoded"},
+                                    body:new URLSearchParams({grant_type:"urn:ietf:params:oauth:grant-type:jwt-bearer",
+                                                            assertion:assertion})
+                                });
+
+    const text =await response.text();
+
+    let result;
+
+    try {
+        result = JSON.parse(text);
+    }
+    catch { result = {  raw: text};
     }
 
+    if (!response.ok) {
+        return {success: false, status: response.status,error: result};
+    }
+    return {success: true,token: result};
+}
 
-    /*
-     * Exchange authorization code for access token
-     *
-     * IMPORTANT:
-     * This now goes to Cloudflare Worker rather than
-     * Salesforce directly.
-     */
 
-    const tokenResponse =
-        await fetch(
-            WORKER_URL + "/token",
-            {
-                method: "POST",
+/*
+ * Get Lightning Out Frontdoor URL
+ * 
+ */
+async function getFrontdoor(accessToken) {
+    const response =    await fetch(SF_DOMAIN +"/services/oauth2/lightningoutsingleaccess",
+                                    {method: "POST",
+                                    headers: {"Authorization":"Bearer " + accessToken, "Content-Type":"application/json"},
+                                    body:JSON.stringify({ appId:LIGHTNING_OUT_APP_ID})
+                                    }
+        );
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+    const text = await response.text();
 
-                body:
-                    JSON.stringify({
+    let result;
 
-                        code:
-                            code,
+    try {
+        result = JSON.parse(text);
+    }
+    catch {
+        result = {raw: text};
+    }
 
-                        code_verifier:
-                            verifier,
+    return {ok: response.ok, status: response.status,result};
+}
 
-                        redirect_uri:
-                            REDIRECT_URI
+//Note: env get secret by cloud flare in this scenerio for MMO please only use backend approach.
+export default {
 
-                    })
+    async fetch(request, env){
+        /*
+         * CORS
+         */
+        if (request.method === "OPTIONS") {
+            return new Response(null,{status: 204,headers: corsHeaders()});
+        }
+
+        /*
+         * Only POST 
+         * Depending on implementation or can be removed
+         */
+
+        if (request.method !== "POST") {
+            return jsonResponse({ error:"Only POST allowed" }, 405 );
+        }
+
+        try {
+            const url = new URL(request.url);
+            const path =url.pathname.replace(/^\/+|\/+$/g, "");
+            const body = await request.json();
+
+            //LOGIN
+            if (path === "login") {
+
+                const username = body.username;
+
+
+                if (!username) {
+                    return jsonResponse({error:"missing username"},400);
+                }
+
+
+                /*
+                 * Generate JWT and authenticate
+                 * against Salesforce.
+                 */
+
+                const login =await getSalesforceToken(username, env.JWT_PRIVATE_KEY);
+                if (!login.success) {
+                    return jsonResponse(login,login.status);
+                }
+
+                const accessToken = login.token.access_token;
+
+                /*
+                 * Get Lightning Out frontdoor.
+                 */
+
+                const frontdoor =await getFrontdoor(accessToken);
+                if (!frontdoor.ok) {
+                    return jsonResponse({error:"Unable to create Lightning Out frontdoor",
+                                        salesforce:frontdoor.result
+                                        },
+                                        frontdoor.status);
+                }
+
+
+                /*
+                 * Please Do NOT return the Salesforce
+                 * access token to the frontend.
+                 *
+                 * Return only the frontdoor URL.
+                 */
+                return jsonResponse({success:true, frontdoor_uri:frontdoor.result.frontdoor_uri});
             }
-        );
 
+            return jsonResponse({error:"Unknown endpoint",
+                                receivedPath:url.pathname,
+                                hint:"Expected /login"
+                                },404);
 
-    const token =
-        await tokenResponse.json();
-
-
-    console.log(
-        "Token response",
-        token
-    );
-
-
-    if (!tokenResponse.ok ||
-        !token.access_token) {
-
-        alert(
-            JSON.stringify(token)
-        );
-
-        return;
+        }
+        catch (error){
+                        return jsonResponse({error:error.message},500);
+                     }
     }
-
-
-    /*
-     * Remove the OAuth code from the
-     * browser address bar.
-     */
-
-    window.history.replaceState(
-        {},
-        document.title,
-        window.location.pathname
-    );
-
-
-    /*
-     * Get a Lightning Out frontdoor URL
-     * from the Cloudflare Worker.
-     */
-
-    const fdResponse =
-        await fetch(
-            WORKER_URL + "/frontdoor",
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body:
-                    JSON.stringify({
-
-                        access_token:
-                            token.access_token
-
-                    })
-            }
-        );
-
-
-    const frontdoor =
-        await fdResponse.json();
-
-
-    console.log(
-        "Frontdoor response",
-        frontdoor
-    );
-
-
-    if (frontdoor.frontdoor_uri) {
-
-            const loApp = document.getElementById("loApp");
-
-loApp.setAttribute(
-    "frontdoor-url",
-    frontdoor.frontdoor_uri
-);
-
-console.log(
-    "ATTRIBUTE:",
-    loApp.getAttribute("frontdoor-url")
-);
-
-console.log(
-    "PROPERTY:",
-    loApp.frontdoorUrl
-);
-            // Expand component height after Salesforce session is ready
-            expandLightningComponent();
-
-
-    }
-    else {
-
-        alert(
-            JSON.stringify(frontdoor)
-        );
-
-    }
-
-})();
-
-
-
-</script>
-
-</body>
-</html>
+};
