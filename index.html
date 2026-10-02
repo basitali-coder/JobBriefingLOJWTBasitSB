@@ -77,8 +77,9 @@ May remove debugs/alert for actual implementation
                     console.log("Lightning Out frontdoor configured");
                     expandLightningComponent();
                 }
-                catch (error) {  
-                    console.error("Login failed:",erroralert( "Login failed: " +error.message);
+                catch (error) { 
+                    console.error("Login failed:", error);
+                    alert("Login failed: " + error.message);
                 }
             };
 
