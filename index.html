@@ -1,94 +1,86 @@
 <!-- 
 Ver: 2.0
-Desc: Uses JWT cert in backend and no secret in front 
-Enter username should be handled in MMO backend for single sign-on
+Ver Desc:   Uses JWT cert in backend and no secret in front 
 Jira: IS-7275
-May remove debugs/alert for actual implementation
+Notes:  Enter username should be handled in MMO backend for single sign-on
+        Remove debugs/alert for actual implementation
+        Repository contains cloudFlareBackend code
 -->
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>External site</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>External site</title>
+        
+        <script src="https://masternaut--basit.sandbox.my.salesforce.com/lightning/lightning.out.latest/index.iife.prod.js"></script>
+        <style>
+            c-lightning-out-job-briefing-wrapper.loaded {background-color: #ffffff;
+                                                        height: 70vh !important;}
     
-    <script src="https://masternaut--basit.sandbox.my.salesforce.com/lightning/lightning.out.latest/index.iife.prod.js"></script>
-    <style>
-        c-lightning-out-job-briefing-wrapper.loaded {background-color: #ffffff;
-                                                    height: 70vh !important;}
-
-    </style>
-</head>
-
-<body>
-    <h2>Job Briefing External page - Basit Sandbox</h2>
-    <p>Enter salesforce user name and click login to login as. (For testing purpose. This login will be handled automatically from MMO backend.)</p>
-    </br/>
-    <label for="username">Salesforce username</label>
-    <input id="username" type="text" placeholder="user@mcf.com">
-    <br/>
-    <button id="loginButton">Login to Salesforce</button>
-    <!-- Obtain code from lightning out in salesforce or change app id for different org-->
-    <lightning-out-application  id="loApp" app-id="1Usbh00000000o1CAA" components="c-lightning-out-job-briefing-wrapper"></lightning-out-application>
-    <c-lightning-out-job-briefing-wrapper></c-lightning-out-job-briefing-wrapper>
-    <script>
-        const WORKER_URL = "https://small-cloud-d8ef.basit-ali.workers.dev";
-        function expandLightningComponent() {
-            const component = document.querySelector("c-lightning-out-job-briefing-wrapper");
-            if (component) {component.classList.add("loaded");
-                console.log("Lightning component expanded");
+        </style>
+    </head>
+    
+    <body>
+        <h2>Job Briefing External page - Basit Sandbox</h2>
+        <p>Enter salesforce user name and click login to login as. (For testing purpose. This login will be handled automatically from MMO backend.)</p>
+        </br/>
+        <label for="username">Salesforce username</label>
+        <input id="username" type="text" placeholder="user@mcf.com">
+        <br/>
+        <button id="loginButton">Login to Salesforce</button>
+        <!-- Obtain code from lightning out in salesforce or change app id for different org-->
+        <lightning-out-application  id="loApp" app-id="1Usbh00000000o1CAA" components="c-lightning-out-job-briefing-wrapper"></lightning-out-application>
+        <c-lightning-out-job-briefing-wrapper></c-lightning-out-job-briefing-wrapper>
+        
+        <script>
+            const WORKER_URL = "https://small-cloud-d8ef.basit-ali.workers.dev";
+            function expandLightningComponent() {
+                const component = document.querySelector("c-lightning-out-job-briefing-wrapper");
+                if (component) {component.classList.add("loaded");
+                    console.log("Lightning component expanded");
+                }
             }
-        }
-
-
-        document.getElementById("loginButton").onclick = async function () {
-            const username =document.getElementById("username").value.trim();
-            if (!username) {
-                alert( "Please enter a Salesforce username.");
-                return;
-            }
-
-
-                try {
-                    const response =
-                        await fetch(WORKER_URL + "/login",
-                            { method: "POST",
-                             headers: {"Content-Type":"application/json"},
-                                body:JSON.stringify({username:username})
-                            }
-                        );
-
-                    const result = await response.json();
-
-                    console.log("Login response:", response.ok );
-
-
-                    if (!response.ok ||!result.frontdoor_uri) {
-                        //Must be removed for actual deployment 
-                        //To be removed only for debug
-                        alert(JSON.stringify('Debug cloud flare/MMO backend. Check console. Result: '+JSON.stringify(result))
-                        );
-                        console.log(JSON.stringify('Debug cloud flare/MMO backend. Check console. Result: '+JSON.stringify(result)));
-                        return;
-
+            
+            document.getElementById("loginButton").onclick = async function () {
+                const username =document.getElementById("username").value.trim();
+                if (!username) {
+                    alert( "Please enter a Salesforce username.");
+                    return;
+                }
+                    try {
+                        const response =
+                            await fetch(WORKER_URL + "/login",
+                                { method: "POST",
+                                 headers: {"Content-Type":"application/json"},
+                                    body:JSON.stringify({username:username})
+                                }
+                            );
+    
+                        const result = await response.json();
+                        console.log("Login response:", response.ok );
+                        
+                        if (!response.ok ||!result.frontdoor_uri) {
+                            //Must be removed for actual deployment 
+                            //To be removed only for debug
+                            alert(JSON.stringify('Debug cloud flare/MMO backend. Check console. Result: '+JSON.stringify(result))
+                            );
+                            console.log(JSON.stringify('Debug cloud flare/MMO backend. Check console. Result: '+JSON.stringify(result)));
+                            return;
+                        }
+    
+                        // Using Lightning Out  Salesforce frontdoor URL obtained from backend
+    
+                        const loApp =document.getElementById("loApp");
+                        loApp.setAttribute("frontdoor-url",result.frontdoor_uri);
+                        console.log("Lightning Out frontdoor configured");
+                        expandLightningComponent();
                     }
-
-
-                    // Using Lightning Out  Salesforce frontdoor URL obtained from backend
-
-                    const loApp =document.getElementById("loApp");
-                    loApp.setAttribute("frontdoor-url",result.frontdoor_uri);
-                    console.log("Lightning Out frontdoor configured");
-                    expandLightningComponent();
-                }
-                catch (error) { 
-                    console.error("Login failed:", error);
-                    alert("Login failed: " + error.message);
-                }
-            };
-
-    </script>
-
-</body>
-
+                    catch (error) { 
+                        console.error("Login failed:", error);
+                        alert("Login failed: " + error.message);
+                    }
+                };    
+        </script>
+    </body>
 </html>
