@@ -22,9 +22,11 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
     </head>
     
     <body>
+        <button onClick="window.location.reload();">Refresh Page</button>            
         <h2>Job Briefing External page - Basit Sandbox</h2>
-        <p>Enter salesforce user name and click login to login as. (For testing purpose only with desired user. This login will be handled automatically from MMO backend.)</p>
+        <p>Enter salesforce user name and click login to login as. (For testing purpose only with desired user. Refresh page change user. This login will be handled automatically from MMO backend.)</p>
         </br/>
+        
         <label for="username">Salesforce username</label>
         <input id="username" type="text" placeholder="user@mcf.com">
         <br/><br/>
@@ -75,6 +77,10 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                         loApp.setAttribute("frontdoor-url",result.frontdoor_uri);
                         console.log("Lightning Out frontdoor configured");
                         expandLightningComponent();
+
+                        // For demo lock user input
+                        const userInput =document.getElementById("username");
+                        userInput.disabled = true;    
                     }
                     catch (error) { 
                         console.error("Login failed:", error);
