@@ -20,9 +20,12 @@ May remove debugs/alert for actual implementation
 </head>
 
 <body>
-    Enter salesforce user name and click login to login as
-    <label for="username"> Salesforce username</label>
+    <h2>Job Briefing External page - Basit Sandbox</h2>
+    <p>Enter salesforce user name and click login to login as. (For testing purpose. This login will be handled automatically from MMO backend.)</p>
+    </br/>
+    <label for="username">Salesforce username</label>
     <input id="username" type="text" placeholder="user@mcf.com">
+    <br/>
     <button id="loginButton">Login to Salesforce</button>
     <!-- Obtain code from lightning out in salesforce or change app id for different org-->
     <lightning-out-application  id="loApp" app-id="1Usbh00000000o1CAA" components="c-lightning-out-job-briefing-wrapper"></lightning-out-application>
