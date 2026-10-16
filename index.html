@@ -72,10 +72,10 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 wrapperContainer.addEventListener("loready", function (event) {
                     console.log(JSON.stringify(event));
                     if(event?.detail?.status == 'ready'){
-                        console.log('loReady event start haddi');
+                        console.log('loready event start haddi');
                         document.getElementById("loadFlowButton").disabled = false;
                         document.getElementById("statustext").innerHTML = 'LO LWC Wrapper Ready';
-                        console.log('loReady event end haddi');
+                        console.log('loready event end haddi');
 
                     }
                 });
