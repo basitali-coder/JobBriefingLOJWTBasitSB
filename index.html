@@ -69,8 +69,11 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             //Event listerner to confirm LO LWC is actually loaded and ready to listen for events like loadflow
             document.addEventListener("loReady", function (event) {
                 if(event?.detail?.status == 'ready'){
+                    console.log('loReady event start haddi');
                     document.getElementById("loadFlowButton").disabled = false;
                     document.getElementById("statustext").innerHTML = 'LO LWC Wrapper Ready';
+                    console.log('loReady event end haddi');
+
                 }
             });
 
@@ -115,10 +118,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                         // For demo lock user input
                         const userInput =document.getElementById("username");
                         userInput.disabled = true;
-                        caseNumberInputElement.disabled=true;
-                        flowapiname =document.getElementById("flowapiname");
-                        flowapiname.disabled = true;
-
+                   
                         const loginButton = document.getElementById("loginButton");
                         loginButton.disabled = true;
                     }
