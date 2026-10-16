@@ -65,11 +65,11 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     this.setCustomValidity("");
                 }
             });
-            console.log('change updated on git hib page 2');
+            console.log('change updated on git hib page 3');
             //Event listerner to confirm LO LWC is actually loaded and ready to listen for events like loadflow
             const wrapperContainer = document.querySelector("c-lightning-out-job-briefing-wrapper");
             if(wrapperContainer){
-                wrapperContainer.addEventListener("loReady", function (event) {
+                wrapperContainer.addEventListener("loready", function (event) {
                     console.log(JSON.stringify(event));
                     if(event?.detail?.status == 'ready'){
                         console.log('loReady event start haddi');
