@@ -47,6 +47,21 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     console.log("Lightning component expanded");
                 }
             }
+
+            //Case number validation
+            const caseNumberInput = document.getElementById("casenumber");
+            caseNumberInput.addEventListener("invalid", function () {
+                if (this.validity.valueMissing) {
+                    this.setCustomValidity("Please enter a case number.");
+                } else if (this.validity.patternMismatch) {
+                    this.setCustomValidity(
+                        "Please enter a case number in the format C2603-000111."
+                    );
+                } else {
+                    this.setCustomValidity("");
+                }
+            });
+            ///
             
             document.getElementById("loginButton").onclick = async function () {
                 const username =document.getElementById("username").value.trim();
