@@ -65,7 +65,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     this.setCustomValidity("");
                 }
             });
-            console.log('change updated on git hib page 7');
+            console.log('change updated on git hib page 8');
             //Event listerner to confirm LO LWC is actually loaded and ready to listen for events like loadflow
             // const wrapperContainer = document.querySelector("c-lightning-out-job-briefing-wrapper");
             // if(wrapperContainer){
@@ -81,7 +81,8 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             //     });
             // }
             ///
-            const wrapperContainer  = document.getElementById("c-lightning-out-job-briefing-wrapper");
+            //As per official events provided by salesforce for LO
+            const wrapperContainer  = document.querySelector("c-lightning-out-job-briefing-wrapper");
 
             wrapperContainer.addEventListener("lo.component.ready", (event) => {
                 console.log("Lightning Out component rendered:", event.detail);
