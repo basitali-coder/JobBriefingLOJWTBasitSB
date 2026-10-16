@@ -65,7 +65,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     this.setCustomValidity("");
                 }
             });
-            console.log('change updated on git hib page 6');
+            console.log('change updated on git hib page 7');
             //Event listerner to confirm LO LWC is actually loaded and ready to listen for events like loadflow
             // const wrapperContainer = document.querySelector("c-lightning-out-job-briefing-wrapper");
             // if(wrapperContainer){
@@ -81,7 +81,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             //     });
             // }
             ///
-            const wrapperContainer  = document.getElementById("loApp");
+            const wrapperContainer  = document.getElementById("c-lightning-out-job-briefing-wrapper");
 
             wrapperContainer.addEventListener("lo.component.ready", (event) => {
                 console.log("Lightning Out component rendered:", event.detail);
@@ -166,6 +166,21 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     alert("Please enter Flow API name");
                     return;
                 }
+                wrapperContainer.dispatchEvent(
+                    new CustomEvent("loadflow", {
+                        detail: {
+                            flowApiName: flowapiname,
+                            caseNumber: casenumber
+                        },
+                        bubbles: true,
+                        composed: true
+                    })
+                );
+
+                console.log("Dispatched loadflow event:", {
+                    flowApiName: flowapiname,
+                    caseNumber: casenumber
+                });
              };
         </script>
     </body>
