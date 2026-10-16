@@ -49,8 +49,8 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             }
 
             //Case number validation
-            const caseNumberInput = document.getElementById("casenumber");
-            caseNumberInput.addEventListener("invalid", function () {
+            const caseNumberInputElement = document.getElementById("casenumber");
+            caseNumberInputElement.addEventListener("invalid", function () {
                 if (this.validity.valueMissing) {
                     this.setCustomValidity("Please enter a case number.");
                 } else if (this.validity.patternMismatch) {
@@ -76,8 +76,8 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     return;
                 }
 
-                if (!caseNumberInput.checkValidity()) {
-                    caseNumberInput.reportValidity();
+                if (!caseNumberInputElement.checkValidity()) {
+                    caseNumberInputElement.reportValidity();
                     return;
                 }
                 if(!flowapiname){
