@@ -1,10 +1,11 @@
 <!-- 
-Ver: 2.0
+Ver: 2.1
 Ver Desc:   Uses JWT cert in backend and no secret in front 
 Jira: IS-7275
 Notes:  Enter username should be handled in MMO backend for single sign-on
         Remove debugs/alert for actual implementation
         Repository contains cloudFlareBackend code
+        Case number and flow as input to LO
 -->
 <!DOCTYPE html>
 <html>
@@ -27,6 +28,10 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
         <p>Enter salesforce user name and click login to login as. (For testing purpose only with permitted user. Refresh page to change user. This login will be handled automatically from MMO backend.)</p>             
         <label for="username">Salesforce username</label>
         <input id="username" type="text" placeholder="user@mcf.com">
+        <label for="casenumber">Case Number</label>
+        <input id="casenumber" type="text" placeholder="C2603-000111" pattern="C[0-9]{4}-[0-9]{6,}">
+        <label for="flowapiname">Flow API Name</label>
+        <input id="flowapiname" <input id="casenumber" type="text" placeholder="Case_Job_Brief">
         <br/><br/>
         <button id="loginButton">Login to Salesforce</button>
         <br/>
@@ -45,9 +50,17 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             
             document.getElementById("loginButton").onclick = async function () {
                 const username =document.getElementById("username").value.trim();
+                const casenumber =document.getElementById("casenumber").value.trim();
                 if (!username) {
                     alert( "Please enter a Salesforce username.");
                     return;
+                }
+                if(!casenumber){
+                    alert("Please enter case number in correct format");
+                }
+                if(!flowapiname){
+                    alert("Please enter Flow API name");
+
                 }
                     try {
                         const response =
