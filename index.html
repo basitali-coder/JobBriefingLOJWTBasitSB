@@ -67,21 +67,37 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             });
             console.log('change updated on git hib page 3');
             //Event listerner to confirm LO LWC is actually loaded and ready to listen for events like loadflow
-            const wrapperContainer = document.querySelector("c-lightning-out-job-briefing-wrapper");
-            if(wrapperContainer){
-                wrapperContainer.addEventListener("loready", function (event) {
-                    console.log(JSON.stringify(event));
-                    if(event?.detail?.status == 'ready'){
-                        console.log('loready event start haddi');
-                        document.getElementById("loadFlowButton").disabled = false;
-                        document.getElementById("statustext").innerHTML = 'LO LWC Wrapper Ready';
-                        console.log('loready event end haddi');
+            // const wrapperContainer = document.querySelector("c-lightning-out-job-briefing-wrapper");
+            // if(wrapperContainer){
+            //     wrapperContainer.addEventListener("loready", function (event) {
+            //         console.log(JSON.stringify(event));
+            //         if(event?.detail?.status == 'ready'){
+            //             console.log('loready event start haddi');
+            //             document.getElementById("loadFlowButton").disabled = false;
+            //             document.getElementById("statustext").innerHTML = 'LO LWC Wrapper Ready';
+            //             console.log('loready event end haddi');
 
-                    }
-                });
-            }
+            //         }
+            //     });
+            // }
             ///
-            
+            loApp.addEventListener("lo.component.ready", (event) => {
+                console.log("Lightning Out component rendered:", event.detail);
+
+                document.getElementById("loadFlowButton").disabled = false;
+                document.getElementById("statustext").textContent =
+                    "LO LWC Wrapper Ready";
+            });
+
+            loApp.addEventListener("lo.component.error", (event) => {
+                console.error("Lightning Out component error:", event.detail);
+
+                document.getElementById("loadFlowButton").disabled = true;
+                document.getElementById("statustext").textContent =
+                    "Lightning Out component failed";
+            });
+
+            ////
             document.getElementById("loginButton").onclick = async function () {
                 const username =document.getElementById("username").value.trim();
 
