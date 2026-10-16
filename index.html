@@ -57,10 +57,11 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 }
                 if(!casenumber){
                     alert("Please enter case number in correct format");
+                    return;
                 }
                 if(!flowapiname){
                     alert("Please enter Flow API name");
-
+                    return;
                 }
                     try {
                         const response =
