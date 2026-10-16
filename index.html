@@ -18,12 +18,15 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
         <style>
             c-lightning-out-job-briefing-wrapper.loaded {background-color: #ffffff;
                                                         height: 70vh !important;}
-    
+            #statustext{
+                color:green; 
+                font-weight=900;
+                margin-left=30px;}    
         </style>
     </head>
     
     <body>
-        <button onClick="window.location.reload();">Refresh Page</button>            
+        <button onClick="window.location.reload();">Refresh Page</button> <span id='statustext'></span>       
         <h2>Job Briefing External Site Page - Basit Sandbox</h2>
         <p>Enter salesforce user name and click login to login as. (For testing purpose only with permitted user. Refresh page to change user. This login will be handled automatically from MMO backend.)</p>             
         <label for="username">Salesforce username</label>
@@ -34,6 +37,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
         <input id="flowapiname" type="text" placeholder="Case_Job_Brief">
         <br/><br/>
         <button id="loginButton">Login to Salesforce</button>
+        <button id="loadFlowButton" disabled>Load flow</button>
         <br/>
         <!-- Obtain code from lightning out in salesforce or change app id for different org-->
         <lightning-out-application  id="loApp" app-id="1Usbh00000000o1CAA" components="c-lightning-out-job-briefing-wrapper"></lightning-out-application>
@@ -61,29 +65,25 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     this.setCustomValidity("");
                 }
             });
+            
+            //Event listerner to confirm LO LWC is actually loaded and ready to listen for events like loadflow
+            component.addEventListener("loReady", function (event) {
+                if(event.?detail.?status == 'ready'){
+                    document.getElementById("loadFlowButton").disabled = false;
+                    document.getElementById("statustext").innerHTML = 'LO LWC Wrapper Ready';
+                }
+            });
+
             ///
             
             document.getElementById("loginButton").onclick = async function () {
                 const username =document.getElementById("username").value.trim();
-                const casenumber =document.getElementById("casenumber").value.trim();
-                const flowapiname =document.getElementById("flowapiname").value.trim();
+
                 if (!username) {
                     alert( "Please enter a Salesforce username.");
                     return;
                 }
-                if(!casenumber){
-                    alert("Please enter case number in correct format");
-                    return;
-                }
 
-                if (!caseNumberInputElement.checkValidity()) {
-                    caseNumberInputElement.reportValidity();
-                    return;
-                }
-                if(!flowapiname){
-                    alert("Please enter Flow API name");
-                    return;
-                }
                     try {
                         const response =
                             await fetch(WORKER_URL + "/login",
@@ -126,7 +126,27 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                         console.error("Login failed:", error);
                         alert("Login failed: " + error.message);
                     }
-                };    
+                };
+            
+            
+
+             document.getElementById("loadFlowButton").onclick = async function () {
+                const casenumber =document.getElementById("casenumber").value.trim();
+                const flowapiname =document.getElementById("flowapiname").value.trim();
+                if(!casenumber){
+                    alert("Please enter case number in correct format");
+                    return;
+                }
+
+                if (!caseNumberInputElement.checkValidity()) {
+                    caseNumberInputElement.reportValidity();
+                    return;
+                }
+                if(!flowapiname){
+                    alert("Please enter Flow API name");
+                    return;
+                }
+             };
         </script>
     </body>
 </html>
