@@ -81,16 +81,16 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             //     });
             // }
             ///
-            const loApp = document.getElementById("loApp");
+            const wrapperContainer  = document.getElementById("loApp");
 
-            loApp.addEventListener("lo.component.ready", (event) => {
+            wrapperContainer.addEventListener("lo.component.ready", (event) => {
                 console.log("Lightning Out component rendered:", event.detail);
 
                 document.getElementById("loadFlowButton").disabled = false;
                 document.getElementById("statustext").textContent =
                     "LO LWC Wrapper Ready";
             });
-            loApp.addEventListener("lo.component.error", (event) => {
+            wrapperContainer.addEventListener("lo.component.error", (event) => {
                 console.error("Lightning Out component error:", event.detail);
 
                 document.getElementById("loadFlowButton").disabled = true;
