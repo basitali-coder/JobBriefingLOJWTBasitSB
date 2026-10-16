@@ -88,7 +88,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 document.getElementById("statustext").textContent =
                     "LO LWC Wrapper Ready";
             });
-
+            const loApp = document.getElementById("loApp");
             loApp.addEventListener("lo.component.error", (event) => {
                 console.error("Lightning Out component error:", event.detail);
 
