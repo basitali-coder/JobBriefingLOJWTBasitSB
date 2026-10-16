@@ -31,7 +31,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
         <label for="casenumber">Case Number</label>
         <input id="casenumber" type="text" placeholder="C2603-000111" pattern="C[0-9]{4}-[0-9]{6,}">
         <label for="flowapiname">Flow API Name</label>
-        <input id="flowapiname" <input id="casenumber" type="text" placeholder="Case_Job_Brief">
+        <input id="flowapiname" type="text" placeholder="Case_Job_Brief">
         <br/><br/>
         <button id="loginButton">Login to Salesforce</button>
         <br/>
@@ -73,6 +73,11 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 }
                 if(!casenumber){
                     alert("Please enter case number in correct format");
+                    return;
+                }
+
+                if (!caseNumberInput.checkValidity()) {
+                    caseNumberInput.reportValidity();
                     return;
                 }
                 if(!flowapiname){
