@@ -65,7 +65,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     this.setCustomValidity("");
                 }
             });
-            console.log('change updated on git hib page 4');
+            console.log('change updated on git hib page 5');
             //Event listerner to confirm LO LWC is actually loaded and ready to listen for events like loadflow
             // const wrapperContainer = document.querySelector("c-lightning-out-job-briefing-wrapper");
             // if(wrapperContainer){
@@ -81,6 +81,8 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             //     });
             // }
             ///
+            const loApp = document.getElementById("loApp");
+
             loApp.addEventListener("lo.component.ready", (event) => {
                 console.log("Lightning Out component rendered:", event.detail);
 
@@ -88,7 +90,6 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 document.getElementById("statustext").textContent =
                     "LO LWC Wrapper Ready";
             });
-            const loApp = document.getElementById("loApp");
             loApp.addEventListener("lo.component.error", (event) => {
                 console.error("Lightning Out component error:", event.detail);
 
