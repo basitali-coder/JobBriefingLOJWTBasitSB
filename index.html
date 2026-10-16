@@ -68,6 +68,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             
             //Event listerner to confirm LO LWC is actually loaded and ready to listen for events like loadflow
             document.addEventListener("loReady", function (event) {
+                console.log(JSON.stringify(event));
                 if(event?.detail?.status == 'ready'){
                     console.log('loReady event start haddi');
                     document.getElementById("loadFlowButton").disabled = false;
