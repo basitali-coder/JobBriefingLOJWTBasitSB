@@ -187,7 +187,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                                                                                 bubbles: true,
                                                                                 composed: true}));
                     let statusTextElement = document.getElementById("statustext");
-                    statusTextElement.textContent = "Requested flow:" + flowApiNameOut + "with Case Number:" + caseNumberOut;
+                    statusTextElement.textContent = "Requested flow: " + flowApiNameOut + " with Case Number: " + caseNumberOut;
                     statusTextElement.style.color = "green";                                                            
                     console.log("Dispatched loadflow event:", JSON.stringify({flowApiName: flowApiNameOut, caseNumber: caseNumberOut}));
                 }
