@@ -49,8 +49,8 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             const wrapperContainer  = document.querySelector("c-lightning-out-job-briefing-wrapper");
             const caseNumberInputElement = document.getElementById("casenumber");
             let isLOWrapperComponentReady = false;
-            let casenumberOut = null;
-            let flowapinameOut = null;
+            let caseNumberOut = null;
+            let flowApiNameOut = null;
 
             //Case number validation
             caseNumberInputElement.addEventListener("invalid", function () {
@@ -76,7 +76,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 statusTextElement.style.color = "green";
                 document.getElementById("loadFlowButton").disabled = false;
                 isLOWrapperComponentReady=true;
-                //If casenumberOut & flowapinameOut are already set following will dispatch event for LO Wrapper
+                //If caseNumberOut & flowApiNameOut are already set following will dispatch event for LO Wrapper
                 sendCaseNumberAndFlowEvent();
             });
             //It also lets us get flow errors that are propogated
@@ -150,16 +150,16 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             }
 
             function setFlowAndCaseToLOComponent(casenumber, flowapiname){
-                flowapinameOut = flowapiname;
-                casenumberOut = casenumberOut;
+                flowApiNameOut = flowapiname;
+                caseNumberOut = casenumber;
                 if(!isLOWrapperComponentReady){return};
                 sendCaseNumberAndFlowEvent();
             }
 
             function sendCaseNumberAndFlowEvent(){
-                if(flowapinameOut && casenumberOut){
-                    wrapperContainer.dispatchEvent(new CustomEvent("loadflow", {detail: {flowApiName: flowapinameOut,
-                                                                    caseNumber: casenumberOut
+                if(flowApiNameOut && caseNumberOut){
+                    wrapperContainer.dispatchEvent(new CustomEvent("loadflow", {detail: {flowApiName: flowApiNameOut,
+                                                                    caseNumber: caseNumberOut
                                                                     },
                                                                     bubbles: true,
                                                                     composed: true
