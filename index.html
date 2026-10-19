@@ -159,11 +159,10 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             function sendCaseNumberAndFlowEvent(){
                 if(flowApiNameOut && caseNumberOut){
                     wrapperContainer.dispatchEvent(new CustomEvent("loadflow", {detail: {flowApiName: flowApiNameOut,
-                                                                    caseNumber: caseNumberOut
-                                                                    },
-                                                                    bubbles: true,
-                                                                    composed: true
-                                                                })
+                                                                                caseNumber: caseNumberOut
+                                                                                },
+                                                                                bubbles: true,
+                                                                                composed: true});
                     );
 
                     console.log("Dispatched loadflow event:", {
