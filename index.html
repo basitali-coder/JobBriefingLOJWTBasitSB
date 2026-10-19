@@ -173,7 +173,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 }
             }
 
-            async login(username){
+            async function login(username){
                 try {
                     const response =
                         await fetch(WORKER_URL + "/login",
