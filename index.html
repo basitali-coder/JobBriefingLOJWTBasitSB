@@ -124,7 +124,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 setFlowAndCaseToLOComponent(casenumber, flowapiname);
             };
 
-            validateLoginInput(username){
+            function validateLoginInput(username){
                 if (!username) {
                     alert( "Please enter a Salesforce username.");
                     return false;
@@ -132,7 +132,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 return true;
             }
 
-            validateFlowInputs(casenumber, flowapiname){
+            function validateFlowInputs(casenumber, flowapiname){
                 if(!casenumber){
                     alert("Please enter case number in correct format");
                     return false;
@@ -149,14 +149,14 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 return true;
             }
 
-            setFlowAndCaseToLOComponent(casenumber, flowapiname){
+            function setFlowAndCaseToLOComponent(casenumber, flowapiname){
                 flowapinameOut = flowapiname;
                 casenumberOut = casenumberOut;
                 if(!isLOWrapperComponentReady){return};
                 sendCaseNumberAndFlowEvent();
             }
 
-            sendCaseNumberAndFlowEvent(){
+            function sendCaseNumberAndFlowEvent(){
                 if(flowapinameOut && casenumberOut){
                     wrapperContainer.dispatchEvent(new CustomEvent("loadflow", {detail: {flowApiName: flowapinameOut,
                                                                     caseNumber: casenumberOut
@@ -173,7 +173,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 }
             }
 
-            login(username){
+            function login(username){
                 try {
                     const response =
                         await fetch(WORKER_URL + "/login",
