@@ -96,7 +96,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 if(!validateLoginInput(username)){
                     return;
                 }
-                login(username);
+                await login(username);
             };            
             
 
@@ -120,7 +120,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 if(!validateFlowInputs(casenumber, flowapiname)){
                     return;
                 }
-                login(username);
+                await login(username);
                 setFlowAndCaseToLOComponent(casenumber, flowapiname);
             };
 
@@ -173,7 +173,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 }
             }
 
-            function login(username){
+            async login(username){
                 try {
                     const response =
                         await fetch(WORKER_URL + "/login",
