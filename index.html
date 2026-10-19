@@ -20,13 +20,17 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                                                         height: 70vh !important;}
             #statustext{
                 color:green; 
-                font-weight=900;
-                margin-left=30px;}    
+                font-weight:500;
+                }    
+            #statusheading{
+                font-weight: 900;
+                margin-left=30px;
+            }
         </style>
     </head>
     
     <body>
-        <button onClick="window.location.reload();">Refresh Page</button> <span style='font-weight:900;'>Status</span><span id='statustext'></span>       
+        <button onClick="window.location.reload();">Refresh Page</button><span id="statusheading">Status</span><span id='statustext'></span>       
         <h2>Job Briefing External Site Page - Basit Sandbox</h2>
         <p>Login to Salesforce button only logins. </p>             
         <label for="username">Salesforce username</label>
