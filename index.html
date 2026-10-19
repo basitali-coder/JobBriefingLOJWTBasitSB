@@ -30,7 +30,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
     </head>
     
     <body>
-        <button onClick="window.location.reload();">Refresh Page</button><span id="statusheading">Status</span><span id='statustext'></span>       
+        <button onClick="window.location.reload();">Refresh Page</button><span id="statusheading">Status: </span><span id='statustext'></span>       
         <h2>Job Briefing External Site Page - Basit Sandbox</h2>
         <p>Login to Salesforce button only logins. </p>             
         <label for="username">Salesforce username</label>
@@ -52,6 +52,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             const WORKER_URL = "https://small-cloud-d8ef.basit-ali.workers.dev";
             const wrapperContainer  = document.querySelector("c-lightning-out-job-briefing-wrapper");
             const caseNumberInputElement = document.getElementById("casenumber");
+            const loApp =document.getElementById("loApp");
             let isLOWrapperComponentReady = false;
             let caseNumberOut = null;
             let flowApiNameOut = null;
@@ -72,7 +73,9 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
 
             //As per official events provided by salesforce for LO
             //Tells that Has wrapper component actually loaded?
-            //This makes wrapper component actually ready to listen to insteam data/
+            //This makes wrapper component actually ready to listen to insteam data
+            //Checkout more on https://developer.salesforce.com/docs/platform/lwc/guide/lightning-out-architecture.html
+            //
 
             wrapperContainer.addEventListener("lo.component.ready", (event) => {
                 let statusTextElement = document.getElementById("statustext");
@@ -85,13 +88,23 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             });
             //It also lets us get flow errors that are propogated
             wrapperContainer.addEventListener("lo.component.error", (event) => {
-                console.error("Lightning Out component error:", event.detail);
+                //Displaying & Logging only before loading of component for testing
+                if(!isLOWrapperComponentReady){
+                    console.error("Lightning Out component error:", event.detail);
+                    //document.getElementById("loadFlowButton").disabled = true;
+                    let statusTextElement = document.getElementById("statustext");
+                    statusTextElement.textContent = "Lightning Out component failed or flow has error that is propogated";
+                    statusTextElement.style.color = "red";
+                    }
+            });
+            //This can be used for users have no password set in salesforce
+            loApp.addEventListener('lo.application.error', (event) => {
+                console.error('Lightning Out application failed');
+                console.error('Message:', event.detail?.message);
+                console.error('Original error:', event.detail?.originalError);
 
-                //document.getElementById("loadFlowButton").disabled = true;
-                let statusTextElement = document.getElementById("statustext");
-                statusTextElement.textContent = "Lightning Out component failed or flow has error that is propogated";
-                statusTextElement.style.color = "red";
-
+                // Log the full event details for troubleshooting.
+                console.log('Full error details:', event.detail);
             });
             //to do other like redirect error etc...
             ////
@@ -198,7 +211,6 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
 
                     // Using Lightning Out  Salesforce frontdoor URL obtained from backend
 
-                    const loApp =document.getElementById("loApp");
                     loApp.setAttribute("frontdoor-url",result.frontdoor_uri);
                     console.log("Lightning Out frontdoor configured");
                     expandLightningComponent();
