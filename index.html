@@ -28,7 +28,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
     <body>
         <button onClick="window.location.reload();">Refresh Page</button> <span id='statustext'></span>       
         <h2>Job Briefing External Site Page - Basit Sandbox</h2>
-        <p>Enter salesforce user name and click login to login as. (For testing purpose only with permitted user. Refresh page to change user. This login will be handled automatically from MMO backend.)</p>             
+        <p>Login to Salesforce button only logins. </p>             
         <label for="username">Salesforce username</label>
         <input id="username" type="text" placeholder="user@mcf.com">
         <label for="casenumber">Case Number</label>
@@ -38,6 +38,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
         <br/><br/>
         <button id="loginButton">Login to Salesforce</button>
         <button id="loadFlowButton" disabled>Load flow</button>
+        <button id="loadBothSequentially" disabled>++Login and load flow++</button>
         <br/>
         <!-- Obtain code from lightning out in salesforce or change app id for different org-->
         <lightning-out-application  id="loApp" app-id="1Usbh00000000o1CAA" components="c-lightning-out-job-briefing-wrapper"></lightning-out-application>
@@ -65,40 +66,32 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     this.setCustomValidity("");
                 }
             });
-            console.log('change updated on git hib page 8');
-            //Event listerner to confirm LO LWC is actually loaded and ready to listen for events like loadflow
-            // const wrapperContainer = document.querySelector("c-lightning-out-job-briefing-wrapper");
-            // if(wrapperContainer){
-            //     wrapperContainer.addEventListener("loready", function (event) {
-            //         console.log(JSON.stringify(event));
-            //         if(event?.detail?.status == 'ready'){
-            //             console.log('loready event start haddi');
-            //             document.getElementById("loadFlowButton").disabled = false;
-            //             document.getElementById("statustext").innerHTML = 'LO LWC Wrapper Ready';
-            //             console.log('loready event end haddi');
+            console.log('change updated on git hib page 9');
 
-            //         }
-            //     });
-            // }
-            ///
             //As per official events provided by salesforce for LO
+            //Tells that Has wrapper component actually loaded?
+            //This makes wrapper component actually ready to listen to insteam data/
             const wrapperContainer  = document.querySelector("c-lightning-out-job-briefing-wrapper");
 
             wrapperContainer.addEventListener("lo.component.ready", (event) => {
                 console.log("Lightning Out component rendered:", event.detail);
 
                 document.getElementById("loadFlowButton").disabled = false;
-                document.getElementById("statustext").textContent =
-                    "LO LWC Wrapper Ready";
+                let statusTextElement = document.getElementById("statustext");
+                statusTextElement.textContent = "LO LWC Wrapper Ready";
+                statusTextElement.style.color = "green";
             });
+            //It also lets us get flow errors that are propogated
             wrapperContainer.addEventListener("lo.component.error", (event) => {
                 console.error("Lightning Out component error:", event.detail);
 
                 document.getElementById("loadFlowButton").disabled = true;
-                document.getElementById("statustext").textContent =
-                    "Lightning Out component failed";
-            });
+                let statusTextElement = document.getElementById("statustext");
+                statusTextElement.textContent = "Lightning Out component failed or flow has error that is propogated";
+                statusTextElement.style.color = "red";
 
+            });
+            //to do other like redirect error etc...
             ////
             document.getElementById("loginButton").onclick = async function () {
                 const username =document.getElementById("username").value.trim();
