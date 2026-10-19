@@ -162,8 +162,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                                                                                 caseNumber: caseNumberOut
                                                                                 },
                                                                                 bubbles: true,
-                                                                                composed: true});
-                    );
+                                                                                composed: true}));
 
                     console.log("Dispatched loadflow event:", {
                         flowApiName: flowapiname,
@@ -201,7 +200,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     console.log("Lightning Out frontdoor configured");
                     expandLightningComponent();
 
-                    // For demo only doing disable enable
+                    // For demo lock user input
                     const userInput =document.getElementById("username");
                     userInput.disabled = true;
                 
