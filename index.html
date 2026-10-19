@@ -164,10 +164,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                                                                                 bubbles: true,
                                                                                 composed: true}));
 
-                    console.log("Dispatched loadflow event:", {
-                        flowApiName: flowapiname,
-                        caseNumber: casenumber
-                    });
+                    console.log("Dispatched loadflow event:", JSON.stringify({flowApiName: flowApiNameOut, caseNumber: caseNumberOut}));
                 }
             }
 
