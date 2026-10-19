@@ -201,12 +201,15 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     console.log("Lightning Out frontdoor configured");
                     expandLightningComponent();
 
-                    // For demo lock user input
+                    // For demo only doing disable enable
                     const userInput =document.getElementById("username");
                     userInput.disabled = true;
                 
                     const loginButton = document.getElementById("loginButton");
                     loginButton.disabled = true;
+
+                    const loadFlowButton = document.getElementById("loadFlowButton");
+                    loadFlowButton.disabled = false;
                 }
                 catch (error) { 
                     console.error("Login failed:", error);
