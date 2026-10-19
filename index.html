@@ -83,7 +83,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             wrapperContainer.addEventListener("lo.component.error", (event) => {
                 console.error("Lightning Out component error:", event.detail);
 
-                document.getElementById("loadFlowButton").disabled = true;
+                //document.getElementById("loadFlowButton").disabled = true;
                 let statusTextElement = document.getElementById("statustext");
                 statusTextElement.textContent = "Lightning Out component failed or flow has error that is propogated";
                 statusTextElement.style.color = "red";
