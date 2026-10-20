@@ -103,7 +103,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 expandLightningComponent();
             });
 
-            //This can be used for users have no password set in salesforce
+            //This can be used to handle errors from LO app on MMO
             loApp.addEventListener('lo.application.error', (event) => {
                 console.error('Lightning Out application failed');
                 console.error('Message:', event.detail?.message);
