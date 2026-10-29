@@ -40,9 +40,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
         <label for="flowapiname">Flow API Name</label>
         <input id="flowapiname" type="text" placeholder="Case_Job_Brief">
         <br/><br/>
-        <button id="loginButton">Login to Salesforce</button>
-        <button id="loadFlowButton" disabled>Load flow</button>
-        <button id="loadBothSequentially">++Login and load flow++</button>
+        <button id="loginAndLoadFlowSequentially">Login and load flow</button>
         <br/>
         <!-- Obtain code from lightning out in salesforce or change app id for different org-->
         <lightning-out-application  id="loApp" app-id="1Usbh00000000o1CAA" components="c-lightning-out-job-briefing-wrapper"></lightning-out-application>
@@ -56,6 +54,8 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             let isLOWrapperComponentReady = false;
             let caseNumberOut = null;
             let flowApiNameOut = null;
+            const flowApiNames = ['Case_Job_Brief','Case_Pre_Check_Screen_Flow','Case_Post_Check_Screen_Flow'];
+            let flowCount = 0;
 
             //Case number validation
             caseNumberInputElement.addEventListener("invalid", function () {
@@ -71,19 +71,16 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             });
             console.log('change updated on git hub page: change number 14');
 
-            //As per official events provided by salesforce for LO
-            //Tells that Has wrapper component actually loaded?
-            //This makes wrapper component actually ready to listen to insteam data
+            //As per salesforce provided events
             //Checkout more on https://developer.salesforce.com/docs/platform/lwc/guide/lightning-out-architecture.html
-            //
 
             wrapperContainer.addEventListener("lo.component.ready", (event) => {
                 let statusTextElement = document.getElementById("statustext");
                 statusTextElement.textContent = "LO LWC Wrapper Ready";
                 statusTextElement.style.color = "green";
-                document.getElementById("loadFlowButton").disabled = false;
                 isLOWrapperComponentReady=true;
                 //If caseNumberOut & flowApiNameOut are already set following will dispatch event for LO Wrapper
+                flowApiNameOut = flowApiNames[0];
                 sendCaseNumberAndFlowEvent();
             });
             //It also lets us get flow errors that are propogated
@@ -91,7 +88,6 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 //Displaying & Logging only before loading of component for testing
                 if(!isLOWrapperComponentReady){
                     console.error("Lightning Out component error:", event.detail);
-                    //document.getElementById("loadFlowButton").disabled = true;
                     let statusTextElement = document.getElementById("statustext");
                     statusTextElement.textContent = "Lightning Out component failed or flow has error that is propogated";
                     statusTextElement.style.color = "red";
@@ -105,45 +101,49 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
 
             //This can be used to handle errors from LO app on MMO
             loApp.addEventListener('lo.application.error', (event) => {
-                console.error('Lightning Out application failed');
-                console.error('Message:', event.detail?.message);
-                console.error('Original error:', event.detail?.originalError);
-
-                // Log the full event details for troubleshooting.
-                console.log('Full error details:', event.detail);
+                if(!isLOWrapperComponentReady){
+                        console.error('Lightning Out application failed');
+                        console.error('Message:', event.detail?.message);
+                        console.error('Original error:', event.detail?.originalError);
+        
+                        // Log the full event details for troubleshooting.
+                        console.log('Full error details:', event.detail);
+                }
             });
-            ////
-            document.getElementById("loginButton").onclick = async function () {
+            //Event listner at end of flow
+            wrapperContainer.addEventListener("flowOutput", function (event) {
+                    const result = event.detail;                
+                    console.log("Flow output received:", result);
+                    let statusTextElement = document.getElementById("statustext");
+                    statusTextElement.textContent = "Recieved flowoutput:"+ result;
+                    statusTextElement.style.color = "green";
+                    const status = result?.status;                
+                    if (status && status == 'success') {
+                       if(flowApiNames.length > flowCount){
+                        flowCount++;
+                        flowApiNameOut = flowApiNames[flowCount];
+                        sendCaseNumberAndFlowEvent();
+                       }else{
+                        statusTextElement.textContent+=" .End of flows";
+                       }
+                    }else{
+                            statusTextElement.textContent+=" .Next flow will not be loaded";
+                            statusTextElement.style.color = "red";
+                    }
+            });
+                 
+            document.getElementById("loginAndLoadFlowSequentially").onclick = async function () {
                 const username =document.getElementById("username").value.trim();
+                const casenumber =document.getElementById("casenumber").value.trim();
                 if(!validateLoginInput(username)){
                     return;
                 }
-                await login(username);
-            };            
-            
 
-            document.getElementById("loadFlowButton").onclick = async function () {
-                const casenumber =document.getElementById("casenumber").value.trim();
-                const flowapiname =document.getElementById("flowapiname").value.trim();
-                if(!validateFlowInputs(casenumber, flowapiname)){ 
-                    return; 
-                }
-                setFlowAndCaseToLOComponent(casenumber, flowapiname);
-            };
-
-            document.getElementById("loadBothSequentially").onclick = async function () {
-                const username =document.getElementById("username").value.trim();
-                const casenumber =document.getElementById("casenumber").value.trim();
-                const flowapiname =document.getElementById("flowapiname").value.trim();
-                if(!validateLoginInput(username)){
-                    return;
-                }
-
-                if(!validateFlowInputs(casenumber, flowapiname)){
+                if(!validateCaseNumberInput(casenumber)){
                     return;
                 }
                 await login(username);
-                setFlowAndCaseToLOComponent(casenumber, flowapiname);
+                setCaseToLOComponent(casenumber);
             };
 
             function validateLoginInput(username){
@@ -154,7 +154,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 return true;
             }
 
-            function validateFlowInputs(casenumber, flowapiname){
+            function validateCaseNumberInput(casenumber){
                 if(!casenumber){
                     alert("Please enter case number in correct format");
                     return false;
@@ -164,18 +164,11 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     caseNumberInputElement.reportValidity();
                     return false;
                 }
-                if(!flowapiname){
-                    alert("Please enter Flow API name");
-                    return false;
-                }
                 return true;
             }
 
-            function setFlowAndCaseToLOComponent(casenumber, flowapiname){
-                flowApiNameOut = flowapiname;
+            function setCaseToLOComponent(casenumber){
                 caseNumberOut = casenumber;
-                if(!isLOWrapperComponentReady){return};
-                sendCaseNumberAndFlowEvent();
             }
 
             function sendCaseNumberAndFlowEvent(){
@@ -223,11 +216,8 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     const userInput =document.getElementById("username");
                     userInput.disabled = true;
                 
-                    const loginButton = document.getElementById("loginButton");
-                    loginButton.disabled = true;
-
-                    const loadBothSequentiallyButton = document.getElementById("loadBothSequentially");
-                    loadBothSequentiallyButton.disabled = true;
+                     const loginAndLoadFlowSequentiallyButton = document.getElementById("loginAndLoadFlowSequentially");
+                    loginAndLoadFlowSequentiallyButton.disabled = true;
                 }
                 catch (error) { 
                     console.error("Login failed:", error);
