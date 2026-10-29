@@ -116,9 +116,10 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     let statusTextElement = document.getElementById("flowOutPutEventText");
                     statusTextElement.textContent = "Recieved flowoutput:"+ JSON.stringify(result);
                     statusTextElement.style.color = "green";
-                    const status = result?.status;                
+                    const status = result?.status;          
+                    console.log(flowCount);      
                     if (status && status == 'success') {
-                       if(flowApiNames.length > flowCount){
+                       if(flowCount < flowApiNames.length - 1){
                         flowCount++;
                         flowApiNameOut = flowApiNames[flowCount];
                         sendCaseNumberAndFlowEvent();
