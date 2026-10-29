@@ -22,7 +22,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 color:green; 
                 font-weight:500;
                 }    
-            #statusheading{
+            #statusheading,#flowEndedText{
                 font-weight: 900;
                 margin-left:30px;
             }
@@ -41,6 +41,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
         <br/><br/>
         <button id="loginAndLoadFlowSequentially">Login and load flow</button>
         <br/>
+        <p class="flowEndedText"></p>
         <!-- Obtain code from lightning out in salesforce or change app id for different org-->
         <lightning-out-application  id="loApp" app-id="1Usbh00000000o1CAA" components="c-lightning-out-job-briefing-wrapper"></lightning-out-application>
         <c-lightning-out-job-briefing-wrapper></c-lightning-out-job-briefing-wrapper>
@@ -125,6 +126,8 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                         sendCaseNumberAndFlowEvent();
                        }else{
                         statusTextElement.textContent+=" .End of flows";
+                        collapseLightningComponent();
+                        document.getElementById('flowEndedText').textContent="End of all flows"
                         console.log("End of flows");
                        }
                     }else{
@@ -216,7 +219,8 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     // For demo lock user input
                     const userInput =document.getElementById("username");
                     userInput.disabled = true;
-                
+                    caseNumberInputElement.disabled = true;
+
                      const loginAndLoadFlowSequentiallyButton = document.getElementById("loginAndLoadFlowSequentially");
                     loginAndLoadFlowSequentiallyButton.disabled = true;
                 }
@@ -230,6 +234,14 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                 const component = document.querySelector("c-lightning-out-job-briefing-wrapper");
                 if (component) {component.classList.add("loaded");
                     console.log("Lightning component expanded");
+                }
+            }
+
+            
+            function collapseLightningComponent() {
+                const component = document.querySelector("c-lightning-out-job-briefing-wrapper");
+                if (component) {component.classList.remove("loaded");
+                    console.log("Lightning component collapsed");
                 }
             }
         </script>
