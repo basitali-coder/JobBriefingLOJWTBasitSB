@@ -18,6 +18,8 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
         <style>
             c-lightning-out-job-briefing-wrapper.loaded {background-color: #ffffff;
                                                         height: 70vh !important;}
+            c-lightning-out-job-briefing-wrapper.hidden {background-color: #ffffff;
+                                                        height: 0vh !important;}
             #statustext,#flowOutPutEventText{
                 color:green; 
                 font-weight:500;
@@ -42,7 +44,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
         <br/><br/>
         <button id="loginAndLoadFlowSequentially">Login and load flow</button>
         <br/>
-        <p class="flowEndedText"></p>
+        <p id="flowEndedText"></p>
         <!-- Obtain code from lightning out in salesforce or change app id for different org-->
         <lightning-out-application  id="loApp" app-id="1Usbh00000000o1CAA" components="c-lightning-out-job-briefing-wrapper"></lightning-out-application>
         <c-lightning-out-job-briefing-wrapper></c-lightning-out-job-briefing-wrapper>
@@ -70,7 +72,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     this.setCustomValidity("");
                 }
             });
-            console.log('change updated on git hub page: change number 18');
+            console.log('change updated on git hub page: change number 19');
 
             //As per salesforce provided events
             //Checkout more on https://developer.salesforce.com/docs/platform/lwc/guide/lightning-out-architecture.html
@@ -241,7 +243,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             
             function collapseLightningComponent() {
                 const component = document.querySelector("c-lightning-out-job-briefing-wrapper");
-                if (component) {component.classList.remove("loaded");
+                if (component) {component.classList.add("hidden");
                     console.log("Lightning component collapsed");
                 }
             }
