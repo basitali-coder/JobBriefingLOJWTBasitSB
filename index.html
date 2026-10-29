@@ -31,15 +31,13 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
     
     <body>
         <button onClick="window.location.reload();">Refresh Page</button><span id="statusheading">Status: </span><span id='statustext'></span> 
-        <p >Flow Output event text:<span id"flowOutPutEventText"></span></p>      
+        <p >Flow Output event text:<span id="flowOutPutEventText"></span></p>      
         <h2>Job Briefing External Site Page - Basit Sandbox</h2>
-        <p>Access flow using two step or one step(++) button.Test flows: Case_Job_Brief, Case_Pre_Check_Screen_Flow and Case_Post_Check_Screen_Flow</p>             
+        <p>Flows will display in this order ->>> Case_Job_Brief, Case_Pre_Check_Screen_Flow and Case_Post_Check_Screen_Flow</p>             
         <label for="username">Salesforce username</label>
         <input id="username" type="text" placeholder="user@mcf.com">
         <label for="casenumber">Case Number</label>
         <input id="casenumber" type="text" placeholder="C2603-000111" pattern="C[0-9]{4}-[0-9]{6,}">
-        <label for="flowapiname">Flow API Name</label>
-        <input id="flowapiname" type="text" placeholder="Case_Job_Brief">
         <br/><br/>
         <button id="loginAndLoadFlowSequentially">Login and load flow</button>
         <br/>
@@ -70,7 +68,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
                     this.setCustomValidity("");
                 }
             });
-            console.log('change updated on git hub page: change number 16');
+            console.log('change updated on git hub page: change number 17');
 
             //As per salesforce provided events
             //Checkout more on https://developer.salesforce.com/docs/platform/lwc/guide/lightning-out-architecture.html
