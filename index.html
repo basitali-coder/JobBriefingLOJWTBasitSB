@@ -30,7 +30,8 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
     </head>
     
     <body>
-        <button onClick="window.location.reload();">Refresh Page</button><span id="statusheading">Status: </span><span id='statustext'></span>       
+        <button onClick="window.location.reload();">Refresh Page</button><span id="statusheading">Status: </span><span id='statustext'></span> 
+        <p >Flow Output event text:<span id"flowOutPutEventText"></span></p>      
         <h2>Job Briefing External Site Page - Basit Sandbox</h2>
         <p>Access flow using two step or one step(++) button.Test flows: Case_Job_Brief, Case_Pre_Check_Screen_Flow and Case_Post_Check_Screen_Flow</p>             
         <label for="username">Salesforce username</label>
@@ -54,7 +55,7 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             let isLOWrapperComponentReady = false;
             let caseNumberOut = null;
             let flowApiNameOut = null;
-            const flowApiNames = ['Case_Job_Brief','Case_Pre_Check_Screen_Flow','Case_Post_Check_Screen_Flow'];
+            const flowApiNames = ['Case_Pre_Check_Screen_Flow', 'Case_Post_Check_Screen_Flow', 'Case_Job_Brief'];
             let flowCount = 0;
 
             //Case number validation
@@ -114,8 +115,8 @@ Notes:  Enter username should be handled in MMO backend for single sign-on
             wrapperContainer.addEventListener("flowOutput", function (event) {
                     const result = event.detail;                
                     console.log("Flow output received:", result);
-                    let statusTextElement = document.getElementById("statustext");
-                    statusTextElement.textContent = "Recieved flowoutput:"+ result;
+                    let statusTextElement = document.getElementById("flowOutPutEventText");
+                    statusTextElement.textContent = "Recieved flowoutput:"+ JSON.stringify(result);
                     statusTextElement.style.color = "green";
                     const status = result?.status;                
                     if (status && status == 'success') {
